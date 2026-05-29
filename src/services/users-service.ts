@@ -28,13 +28,11 @@ export async function registerUser({ name, email, password }: any) {
 
 export async function loginUser({ email, password }: any) {
   // 1. Cari user di database berdasarkan email
-  const existingUsers = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
-  if (existingUsers.length === 0) {
+  if (!user) {
     throw new Error("Email atau password salah");
   }
-
-  const user = existingUsers[0];
 
   // 2. Verifikasi password menggunakan Bun.password.verify
   const isPasswordValid = await Bun.password.verify(password, user.password);
