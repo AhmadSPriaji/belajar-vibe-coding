@@ -5,6 +5,6 @@ export default defineConfig({
   schema: "./src/db/schema.ts",
   out: "./drizzle",
   dbCredentials: {
-    url: process.env.DATABASE_URL || "mysql://root:kalapa@127.0.0.1:3306/belajar_vibe",
+    url: process.env.DATABASE_URL || "mysql://root:@127.0.0.1:3306/belajar_vibe",
   },
 });
