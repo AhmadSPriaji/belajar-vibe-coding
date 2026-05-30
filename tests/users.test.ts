@@ -151,7 +151,7 @@ describe("API Users Unit Tests", () => {
       );
 
       expect(response.status).toBe(200);
-      const json = await response.json();
+      const json: any = await response.json();
       expect(json.data).toBeDefined();
       expect(typeof json.data).toBe("string");
     });
@@ -234,7 +234,7 @@ describe("API Users Unit Tests", () => {
           }),
         })
       );
-      const loginJson = await loginResponse.json();
+      const loginJson: any = await loginResponse.json();
       validToken = loginJson.data;
     });
 
@@ -249,7 +249,7 @@ describe("API Users Unit Tests", () => {
       );
 
       expect(response.status).toBe(200);
-      const json = await response.json();
+      const json: any = await response.json();
       expect(json.data).toBeDefined();
       expect(json.data.name).toBe("Budi Utomo");
       expect(json.data.email).toBe("budi@example.com");
@@ -325,7 +325,7 @@ describe("API Users Unit Tests", () => {
           }),
         })
       );
-      const loginJson = await loginResponse.json();
+      const loginJson: any = await loginResponse.json();
       validToken = loginJson.data;
     });
 
