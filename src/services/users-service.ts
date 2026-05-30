@@ -2,6 +2,15 @@ import { db } from "../db";
 import { users, sessions } from "../db/schema";
 import { eq } from "drizzle-orm";
 
+/**
+ * Fungsi untuk mendaftarkan pengguna baru ke dalam sistem.
+ * Melakukan pengecekan email duplikat, melakukan hashing pada password,
+ * lalu menyimpan data pengguna ke dalam database.
+ * 
+ * @param payload Object yang berisi name, email, dan password dari pengguna
+ * @returns String "OK" jika berhasil
+ * @throws Error jika email sudah terdaftar sebelumnya
+ */
 export async function registerUser({ name, email, password }: any) {
   // 1. Cek apakah email user sudah terdaftar
   const existingUsers = await db.select().from(users).where(eq(users.email, email)).limit(1);
@@ -26,6 +35,16 @@ export async function registerUser({ name, email, password }: any) {
   return "OK";
 }
 
+/**
+ * Fungsi untuk memproses login pengguna.
+ * Memverifikasi ketersediaan email dan kecocokan password.
+ * Jika valid, akan menghasilkan sebuah token UUID (sesi login)
+ * yang kemudian disimpan di database dan dikembalikan ke klien.
+ * 
+ * @param payload Object yang berisi email dan password login
+ * @returns String token UUID untuk autentikasi sesi
+ * @throws Error jika email tidak ditemukan atau password tidak cocok
+ */
 export async function loginUser({ email, password }: any) {
   // 1. Cari user di database berdasarkan email
   const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
@@ -53,6 +72,15 @@ export async function loginUser({ email, password }: any) {
   return token;
 }
 
+/**
+ * Fungsi untuk mengambil data profil pengguna yang sedang login saat ini.
+ * Memvalidasi token sesi yang diberikan, mencari data user terkait,
+ * lalu mengembalikan informasi dasar user tersebut (tanpa menyertakan password).
+ * 
+ * @param token String token autentikasi sesi
+ * @returns Object data profil pengguna (id, name, email, created_at)
+ * @throws Error "Unauthorized" jika token tidak valid atau user tidak ditemukan
+ */
 export async function getCurrentUser(token: string) {
   // 1. Cari session berdasarkan token
   const [session] = await db.select().from(sessions).where(eq(sessions.token, token)).limit(1);
@@ -77,6 +105,15 @@ export async function getCurrentUser(token: string) {
   };
 }
 
+/**
+ * Fungsi untuk melakukan proses logout pengguna.
+ * Menghapus data sesi berdasarkan token yang dikirim,
+ * sehingga token tersebut tidak bisa lagi digunakan untuk autentikasi.
+ * 
+ * @param token String token autentikasi sesi yang ingin dihapus
+ * @returns String "OK" jika berhasil
+ * @throws Error "Unauthorized" jika token tidak ditemukan di database
+ */
 export async function logoutUser(token: string) {
   // Langsung hapus session berdasarkan token
   const [result] = await db.delete(sessions).where(eq(sessions.token, token));
