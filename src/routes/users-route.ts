@@ -8,7 +8,11 @@ export const usersRoute = new Elysia({ prefix: "/users" })
       if (!authorization || !authorization.startsWith("Bearer ")) {
         throw new Error("Unauthorized");
       }
-      return authorization.substring(7);
+      const token = authorization.substring(7);
+      if (token.length > 255) {
+        throw new Error("Unauthorized");
+      }
+      return token;
     }
   }))
   .get("/current", async ({ getBearerToken, set }) => {
@@ -39,9 +43,9 @@ export const usersRoute = new Elysia({ prefix: "/users" })
     }
   }, {
     body: t.Object({
-      name: t.String(),
-      email: t.String(),
-      password: t.String(),
+      name: t.String({ maxLength: 255 }),
+      email: t.String({ format: "email", maxLength: 255 }),
+      password: t.String({ maxLength: 100 }),
     })
   })
   .post("/login", async ({ body, set }) => {
@@ -58,8 +62,8 @@ export const usersRoute = new Elysia({ prefix: "/users" })
     }
   }, {
     body: t.Object({
-      email: t.String(),
-      password: t.String(),
+      email: t.String({ format: "email", maxLength: 255 }),
+      password: t.String({ maxLength: 100 }),
     })
   })
   .delete("/logout", async ({ getBearerToken, set }) => {
