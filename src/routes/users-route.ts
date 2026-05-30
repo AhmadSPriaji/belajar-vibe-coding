@@ -1,15 +1,19 @@
 import { Elysia, t } from "elysia";
-import { registerUser, loginUser, getCurrentUser } from "../services/users-service";
+import { registerUser, loginUser, getCurrentUser, logoutUser } from "../services/users-service";
 
 export const usersRoute = new Elysia({ prefix: "/users" })
-  .get("/current", async ({ headers, set }) => {
-    try {
+  .derive(({ headers }) => ({
+    getBearerToken: () => {
       const authorization = headers.authorization;
       if (!authorization || !authorization.startsWith("Bearer ")) {
-        set.status = 401;
-        return { error: "Unauthorized" };
+        throw new Error("Unauthorized");
       }
-      const token = authorization.substring(7);
+      return authorization.substring(7);
+    }
+  }))
+  .get("/current", async ({ getBearerToken, set }) => {
+    try {
+      const token = getBearerToken();
       const user = await getCurrentUser(token);
       return { data: user };
     } catch (error: any) {
@@ -57,4 +61,18 @@ export const usersRoute = new Elysia({ prefix: "/users" })
       email: t.String(),
       password: t.String(),
     })
+  })
+  .delete("/logout", async ({ getBearerToken, set }) => {
+    try {
+      const token = getBearerToken();
+      await logoutUser(token);
+      return { data: "OK" };
+    } catch (error: any) {
+      if (error.message === "Unauthorized") {
+        set.status = 401;
+        return { error: "Unauthorized" };
+      }
+      set.status = 500;
+      return { error: "Terjadi kesalahan pada server" };
+    }
   });
