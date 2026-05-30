@@ -28,6 +28,11 @@ export const usersRoute = new Elysia({ prefix: "/users" })
       set.status = 500;
       return { error: "Terjadi kesalahan pada server" };
     }
+  }, {
+    detail: {
+      summary: "Dapatkan Profil User Saat Ini",
+      description: "Mengambil data profil user yang sedang login berdasarkan token Bearer."
+    }
   })
   .post("/", async ({ body, set }) => {
     try {
@@ -42,6 +47,10 @@ export const usersRoute = new Elysia({ prefix: "/users" })
       return { error: "Terjadi kesalahan pada server" };
     }
   }, {
+    detail: {
+      summary: "Registrasi User Baru",
+      description: "Endpoint untuk mendaftarkan akun baru dengan mengirimkan nama, email, dan password."
+    },
     body: t.Object({
       name: t.String({ maxLength: 255 }),
       email: t.String({ format: "email", maxLength: 255 }),
@@ -61,6 +70,10 @@ export const usersRoute = new Elysia({ prefix: "/users" })
       return { error: "Terjadi kesalahan pada server" };
     }
   }, {
+    detail: {
+      summary: "Login User",
+      description: "Endpoint untuk melakukan autentikasi user dan mendapatkan session token."
+    },
     body: t.Object({
       email: t.String({ format: "email", maxLength: 255 }),
       password: t.String({ maxLength: 100 }),
@@ -78,5 +91,10 @@ export const usersRoute = new Elysia({ prefix: "/users" })
       }
       set.status = 500;
       return { error: "Terjadi kesalahan pada server" };
+    }
+  }, {
+    detail: {
+      summary: "Logout User",
+      description: "Mengakhiri session user dan menghapus token dari database."
     }
   });
